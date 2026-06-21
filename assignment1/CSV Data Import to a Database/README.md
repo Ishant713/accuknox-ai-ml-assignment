@@ -96,11 +96,11 @@ This confirms that all employee records were imported successfully.
 
 ### Terminal Output
 
-![Terminal Output](screenshots/terminal_output.png)
+![Terminal Output](Screenshots/terminal_output.png)
 
 ### SQLite Database
 
-![Employee Database](screenshots/database_output.png)
+![Employee Database](Screenshots/database_output.png)
 
 
 
