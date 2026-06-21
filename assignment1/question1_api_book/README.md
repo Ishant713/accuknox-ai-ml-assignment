@@ -23,9 +23,6 @@ https://openlibrary.org/search.json?q=python
 * Displays stored records in the terminal.
 * it will creates the database automatically if it does not exist.
 
-## Project Structure
-
-![Folder Structure](screenshots/folder_Structure.png)
 
 ## How to Run
 
