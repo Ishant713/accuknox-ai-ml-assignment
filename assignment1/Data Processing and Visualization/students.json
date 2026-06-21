@@ -1,0 +1,24 @@
+{
+  "students": [
+    { "name": "Aarav Sharma", "score": 85 },
+    { "name": "Vivaan Gupta", "score": 78 },
+    { "name": "Aditya Verma", "score": 92 },
+    { "name": "Krishna Patel", "score": 74 },
+    { "name": "Arjun Singh", "score": 88 },
+    { "name": "Rohan Mehta", "score": 81 },
+    { "name": "Rahul Yadav", "score": 69 },
+    { "name": "Karan Malhotra", "score": 90 },
+    { "name": "Priya Sharma", "score": 95 },
+    { "name": "Ananya Gupta", "score": 87 },
+    { "name": "Sneha Patel", "score": 79 },
+    { "name": "Pooja Verma", "score": 83 },
+    { "name": "Neha Singh", "score": 76 },
+    { "name": "Aditi Joshi", "score": 91 },
+    { "name": "Ishita Kapoor", "score": 84 },
+    { "name": "Akash Mishra", "score": 73 },
+    { "name": "Manish Kumar", "score": 80 },
+    { "name": "Saurabh Jain", "score": 86 },
+    { "name": "Nikhil Agarwal", "score": 77 },
+    { "name": "Harsh Vardhan", "score": 89 }
+  ]
+}
