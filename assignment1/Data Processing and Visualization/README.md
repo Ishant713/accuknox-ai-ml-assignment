@@ -34,10 +34,6 @@ http://127.0.0.1:5000/students
 6. Generate a bar chart to visualize student scores.
 7. Saved the chart as `student_scores_chart.png`.
 
-## Project Structure
-
-![Folder Structure](screenshots/folder_struc.png)
-
 ## How to Run
 
 ### 1. Install Dependencies
@@ -102,15 +98,15 @@ Average Score:
 
 ### Terminal Output
 
-![Terminal Output](screenshots/terminal_output.png)
+![Terminal Output](Screenshots/terminal_output.png)
 
 ### Student Score Chart
 
-![Bar Chart](screenshots/Bar_chart.png)
+![Bar Chart](Screenshots/Bar_chart.png)
 
 ### SQLite Database
 
-![SQLite Database](screenshots/sqlite_database.png)
+![SQLite Database](Screenshots/sqlite_database.png)
 
 ## Assumptions
 
