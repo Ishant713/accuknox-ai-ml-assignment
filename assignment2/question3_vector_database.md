@@ -24,9 +24,15 @@ When a query comes in, it gets converted into a vector too. The database finds t
 
 ---
 
-## The Problem — My AgenticRAG Project
+### The Hypothetical Problem — Internal Knowledge Base
 
-The problem I actually built a solution for was this: users upload their own documents — PDFs, reports, notes — and then ask questions about them in natural language. Keyword search doesn't work here because users don't always use the exact words that appear in the document. The system needs to understand what they're asking and find the most relevant chunks, even if the wording is different.
+Picture a mid-sized tech company with thousands of internal documents — design specs, API docs, troubleshooting guides, engineering notes. Employees search this all the time, but keyword search keeps falling short because:
+
+
+People don't always use the exact terms from the document
+Technical synonyms and acronyms are everywhere ("distributed system" vs "microservices")
+Documents span multiple teams and domains
+New files get added constantly
 
 ### The system needed to:
 
@@ -68,7 +74,7 @@ Fast and lightweight, good for prototyping. No persistence, so data disappears w
 
 ## My Choice — Qdrant
 
-I went with Qdrant, because of the following reasons:
+For this knowledge base, I'd go with Qdrant. Here's the reasoning:
 
 ---
 
@@ -125,7 +131,3 @@ It's open-source with a solid free tier. For a project at this scale, Pinecone w
 **Milvus** — for very high throughput with GPU support and a team to manage the setup.
 
 ---
-
-## My Experience
-
-Setting Qdrant up took less than an hour. The metadata filtering made multi-session document handling clean and simple. Performance held up well even as the number of chunks grew. It was genuinely the right tool for what I was building, and I'd pick it again without hesitation.
