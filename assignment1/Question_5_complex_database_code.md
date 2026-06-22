@@ -1,62 +1,100 @@
 # Question 5: Most Complex Database Code
 
-**File:** `src/rag/retriever_setup.py`  
-**Repo:** Ishant713/AgenticRAG  
-**Link:** [retriever_setup.py on GitHub](https://github.com/Ishant713/AgenticRAG/blob/main/src/rag/retriever_setup.py)
+**File:** `src/rag/retriever_setup.py`
+**Repo:** `Ishant713/AgenticRAG`
 
 ---
 
 ## Why This Is My Most Complex Database File
 
-`graph_builder.py` handles the thinking, but this file is where data actually lives. It controls the vector database — the thing that finds and returns relevant documents when a question comes in. Looks simple from the outside, but there's more to it than it seems.
+This file handles the document retrieval side of the RAG system. When a user uploads documents, this is what converts them into vectors, stores them, and makes them searchable by the AI agent. It looks simple on the surface, but it's doing quite a few things at once — processing documents, generating embeddings, managing vector storage, and exposing all of that as a tool the agent can actually use.
 
 ---
 
-## Breakdown
+## 1. Turning Text Into Vectors
 
-### 1. One Shared Vector Store for the Whole App
-
-I used a global `_vectorstore` variable to hold the Qdrant index. Keeping it global means every part of the app talks to the same index — no duplicates, no inconsistency. It's a straightforward decision but an important one.
-
----
-
-### 2. Lazy Initialization
-
-`get_retriever()` doesn't build the vector store on startup. It waits until something actually needs it. If no files have been uploaded yet, it quietly creates a placeholder document just so the store has something to initialize with. That way the app stays up and running even before any real data exists.
+Before anything can be stored or searched, the document chunks need to be converted into numbers. I used the `sentence-transformers/all-MiniLM-L6-v2` model from Hugging Face for this.
 
 ```python
-def get_retriever():
-    global _vectorstore
-    if _vectorstore is None:
-        dummy_doc = Document(page_content="Placeholder", metadata={"source": "init"})
-        _vectorstore = Qdrant.from_documents([dummy_doc], embeddings)
-    return _vectorstore.as_retriever(search_kwargs={"k": 4})
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 ```
+
+The reason this matters is that these embeddings capture *meaning*, not just words. So if a user asks something in different phrasing than what's in the document, the system can still find the right content.
 
 ---
 
-### 3. Adding New Documents on the Fly
+## 2. Building the Vector Store
 
-Early on I noticed that every upload was resetting the whole index, which meant previously added documents would vanish. Not great. So I tweaked `retriever_chain()` — now it checks if an index is already there before doing anything. New chunks get added to whatever exists. If nothing's there yet, it starts fresh. Small change, but it fixed a real problem.
+When documents are uploaded, `retriever_chain()` takes the chunks and builds a FAISS index from them.
 
 ```python
-def retriever_chain(chunks):
-    global _vectorstore
-    if _vectorstore is not None:
-        _vectorstore.add_documents(chunks)
-    else:
-        _vectorstore = Qdrant.from_documents(chunks, embeddings)
-    return True
+vectorstore = FAISS.from_documents(
+    documents=chunks,
+    embedding=embeddings
+)
 ```
 
----
-
-### 4. Embeddings
-
-Each document chunk gets converted into a vector — specifically 1536 dimensions — using OpenAI's `text-embedding-3-small`. This is what powers semantic search. The system stops caring about exact words and starts finding content that actually matches the meaning of the question.
+Each chunk gets embedded and stored in the index. From there, FAISS can do fast similarity searches across all of them.
 
 ---
 
-### 5. Why Qdrant
+## 3. Keeping One Shared Index
 
-Qdrant is persistent and production-ready, which is exactly what this system needs. Unlike in-memory options, data survives server restarts and the index scales well as more documents get added. It was the right choice from the start given that the app is meant to handle real document uploads over time, not just quick demos.
+To avoid rebuilding the vector store on every query, it gets saved to a global variable.
+
+```python
+_faiss_vectorstore = vectorstore
+```
+
+This way, every part of the app reads from the same index without recreating it each time. Simple but important for performance.
+
+---
+
+## 4. Setting Up the Retriever
+
+`get_retriever()` takes the stored index and turns it into a retriever object.
+
+```python
+retriever = _faiss_vectorstore.as_retriever(
+    search_kwargs={"k": 3}
+)
+```
+
+The `k=3` means it pulls the 3 most relevant chunks for any given query. That's usually enough context for the model to generate a good answer without flooding it with too much information.
+
+---
+
+## 5. Wrapping It as an Agent Tool
+
+The retriever gets wrapped into a LangChain tool so the agent knows it exists and can call it when needed.
+
+```python
+retriever_tool = create_retriever_tool(
+    retriever,
+    "retriever_customer_uploaded_documents",
+    description
+)
+```
+
+This is what connects the document search to the actual agent workflow. Without this step, the agent wouldn't know how or when to search the uploaded files.
+
+---
+
+## 6. Dynamic Tool Description
+
+The tool's description — which tells the agent when to use it — gets loaded from a text file at runtime.
+
+```python
+with open("description.txt", "r", encoding="utf-8") as f:
+    description = f.read()
+```
+
+This means you can change how the retriever behaves for different document types without touching the code. Just update the description file.
+
+---
+
+## Why This File Matters
+
+This is the bridge between uploaded documents and the AI agent. Take it out and the agent has no way to access or reason over anything the user uploads. It handles embedding, storage, search, and tool registration — all in one place. That's why I'd point to this as my most complex database-related code.
